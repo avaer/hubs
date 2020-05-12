@@ -173,7 +173,7 @@ const NOISY_OCCUPANT_COUNT = 12; // Above this # of occupants, we stop posting j
 const qs = new URLSearchParams(location.search);
 const isMobile = AFRAME.utils.device.isMobile();
 const isMobileVR = AFRAME.utils.device.isMobileVR();
-const isEmbed = window.self !== window.top;
+const isEmbed = false; // window.self !== window.top;
 if (isEmbed && !qs.get("embed_token")) {
   // Should be covered by X-Frame-Options, but just in case.
   throw new Error("no embed token");
