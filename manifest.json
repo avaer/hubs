@@ -2,5 +2,5 @@
   "name": "Mozilla Hubs",
   "description": "Mozilla Hubs XRPackage build",
   "xr_type": "webxr-site@0.0.1",
-  "start_url": "dist/hub.html?hub_id=kAfZp4z&vr_entry_type=vr_now"
+  "start_url": "hub.html?hub_id=kAfZp4z&vr_entry_type=vr_now"
 }
