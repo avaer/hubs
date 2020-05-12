@@ -1,0 +1,6 @@
+{
+  "name": "Mozilla Hubs",
+  "description": "Mozilla Hubs XRPackage build",
+  "xr_type": "webxr-site@0.0.1",
+  "start_url": "dist/hub.html?vr_entry_type=vr_now"
+}
