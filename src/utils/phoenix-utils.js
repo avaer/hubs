@@ -4,6 +4,8 @@ import configs from "../utils/configs";
 
 import Store from "../storage/store";
 
+const proxyHost = `proxy.webaverse.workers.dev`;
+
 export function hasReticulumServer() {
   return !!configs.RETICULUM_SERVER;
 }
@@ -18,7 +20,7 @@ let invalidatedReticulumMetaThisSession = false;
 
 export function getReticulumFetchUrl(path, absolute = false, host = null, port = null) {
   if (host || hasReticulumServer()) {
-    return `https://${host || configs.RETICULUM_SERVER}${port ? `:${port}` : ""}${path}`;
+    return `https://${proxyHost}/` + encodeURIComponent(`https://${host || configs.RETICULUM_SERVER}${port ? `:${port}` : ""}${path}`);
   } else if (absolute) {
     resolverLink.href = path;
     return resolverLink.href;
@@ -90,9 +92,9 @@ export async function connectToReticulum(debug = false, params = null, socketCla
     const protocol =
       qs.get("phx_protocol") ||
       configs.RETICULUM_SOCKET_PROTOCOL ||
-      (document.location.protocol === "https:" ? "wss:" : "ws:");
+      'wss:' // (document.location.protocol === "https:" ? "wss:" : "ws:");
 
-    return `${protocol}//${host}${port ? `:${port}` : ""}`;
+    return `wss://${proxyHost}/` + encodeURIComponent(`${protocol}//${host}${port ? `:${port}` : ""}`);
   };
 
   const socketUrl = await getNewSocketUrl();
@@ -276,3 +278,5 @@ export function discordBridgesForPresences(presences) {
   }
   return channels;
 }
+
+export {proxyHost};
