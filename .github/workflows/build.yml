@@ -13,6 +13,7 @@ jobs:
         run: |
           npm install
           npm run build
+          cp manifest.json dist/
       - name: Build package
         id: build
         uses: webaverse/xrpackage-build-action@v1.0.0
