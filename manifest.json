@@ -1,6 +1,6 @@
 {
   "name": "Mozilla Hubs",
-  "description": "Mozilla Hubs XRPackage build",
+  "description": "Duck-themed multi-user virtual spaces in WebVR. Built with A-Frame.",
   "xr_type": "webxr-site@0.0.1",
-  "start_url": "hub.html?hub_id=kAfZp4z&vr_entry_type=vr_now"
+  "start_url": "index.html"
 }
