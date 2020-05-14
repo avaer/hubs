@@ -9,11 +9,15 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
+      - name: Build Hubs
+        run: |
+          npm install
+          npm run build
       - name: Build package
         id: build
         uses: webaverse/xrpackage-build-action@v1.0.0
         with:
-          src: '.'
+          src: 'dist/'
           dst: 'a.wbn'
       - name: Echo build result
         run: echo 'The output file is ${{ steps.build.outputs.dst }}; the release name is ${{ steps.build.outputs.name }}'
