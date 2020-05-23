@@ -29,6 +29,7 @@ let isAdmin = false;
     pdfjs.GlobalWorkerOptions.workerSrc = `${configs[x]}../assets/js/pdfjs-dist@2.1.266/build/pdf.worker.js`;
   }
 });
+configs.RETICULUM_SERVER = window.xrpackage['RETICULUM_SERVER'];
 
 // Also include configs that reticulum injects as a script in the page head.
 
