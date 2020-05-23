@@ -566,14 +566,19 @@ class UIRoot extends Component {
   performDirectEntryFlow = async enterInVR => {
     this.setState({ enterInVR, waitingOnAudio: true });
 
-    const hasGrantedMic = true; // (await grantedMicLabels()).length > 0;
+    const hasGrantedMic = (await grantedMicLabels()).length > 0;
 
     if (hasGrantedMic) {
-      // await this.setMediaStreamToDefault();
+      await this.setMediaStreamToDefault();
+    }
+    this.beginOrSkipAudioSetup();
+
+    /* if (hasGrantedMic) {
+      await this.setMediaStreamToDefault();
       this.beginOrSkipAudioSetup();
     } else {
       this.pushHistoryState("entry_step", "mic_grant");
-    }
+    } */
 
     this.setState({ waitingOnAudio: false });
   };
