@@ -273,7 +273,7 @@ if (document.location.pathname.includes("hub.html")) {
 const history = routerBaseName === "/" ? createMemoryHistory() : createBrowserHistory({ basename: routerBaseName });
 window.APP.history = history;
 
-const qsVREntryType = qs.get("vr_entry_type");
+const qsVREntryType = window.xrpackage.schema['vr_entry_type']; // qs.get("vr_entry_type");
 
 function mountUI(props = {}) {
   const scene = document.querySelector("a-scene");
@@ -726,7 +726,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const defaultRoomId = configs.feature("default_room_id");
 
   const hubId =
-    qs.get("hub_id") ||
+    // qs.get("hub_id") ||
+    window.xrpackage.schema['hub_id'] ||
     (document.location.pathname === "/" && defaultRoomId
       ? defaultRoomId
       : document.location.pathname.substring(1).split("/")[0]);
