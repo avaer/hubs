@@ -5,9 +5,18 @@
   "start_url": "hub.html",
   "xr_details": {
     "schema": {
-      "hub_id": "string",
-      "vr_entry_type": "string",
-      "RETICULUM_SERVER": "string"
+      "hub_id": {
+        "type": "string",
+        "default": "cSNKEgE"
+      },
+      "vr_entry_type": {
+        "type": "string",
+        "default": "vr_now"
+      },
+      "RETICULUM_SERVER": {
+        "type": "string",
+        "default": "hubs.mozilla.com"
+      }
     }
   }
 }
