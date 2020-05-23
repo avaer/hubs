@@ -6,7 +6,8 @@
   "xr_details": {
     "schema": {
       "hub_id": "string",
-      "vr_entry_type": "vr_now"
+      "vr_entry_type": "string",
+      "RETICULUM_SERVER": "string"
     }
   }
 }
