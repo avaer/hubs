@@ -1,4 +1,4 @@
-import { hasReticulumServer } from "./phoenix-utils";
+import { hasReticulumServer, proxyHost } from "./phoenix-utils";
 import configs from "./configs";
 
 const nonCorsProxyDomains = (configs.NON_CORS_PROXY_DOMAINS || "").split(",");
@@ -100,6 +100,11 @@ export function getAbsoluteHref(baseUrl, relativeUrl) {
 
 export const getCustomGLTFParserURLResolver = gltfUrl => url => {
   if (typeof url !== "string" || url === "") return "";
+  const proxyHeader = `https://${proxyHost}/`;
+  const localHeader = `${location.protocol}//${location.host}/`;
+  if (/^(https?:)?\/\//i.test(url) && !url.startsWith(localHeader) && !url.startsWith(proxyHeader)) {
+    url = `https://${proxyHost}/` + encodeURIComponent(url);
+  }
   if (/^(https?:)?\/\//i.test(url)) return url;
   if (/^data:.*,.*$/i.test(url)) return url;
   if (/^blob:.*$/i.test(url)) return url;
