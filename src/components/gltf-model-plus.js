@@ -8,6 +8,7 @@ import { promisifyWorker } from "../utils/promisify-worker.js";
 import { MeshBVH, acceleratedRaycast } from "three-mesh-bvh";
 import { disposeNode, cloneObject3D } from "../utils/three-utils";
 import {proxyHost} from '../utils/phoenix-utils';
+import configs from '../utils/configs.js';
 
 THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
@@ -417,7 +418,7 @@ export async function loadGLTF(src, contentType, preferredTechnique, onProgress,
 }
 
 export async function loadModel(src, contentType = null, useCache = false, jsonPreprocessor = null) {
-  if (/^https:\/\/dev\.reticulum\.io\//.test(src)) {
+  if (src.startsWith('https://' + configs.RETICULUM_SERVER + '/')) {
     src = `https://${proxyHost}/` + encodeURIComponent(src);
   }
   if (/^https:\/\/cors-proxy-dev\.reticulum\.io\//.test(src)) {
