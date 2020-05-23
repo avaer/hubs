@@ -1,4 +1,1 @@
-npm ci
-npm run build
-cp manifest.json dist/
-xrpk build dist/
+npm run build && cp manifest.json dist/ && xrpk build dist/
