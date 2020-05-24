@@ -1597,3 +1597,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   authChannel.setSocket(socket);
   linkChannel.setSocket(socket);
 });
+
+navigator.xr.addEventListener('event', e => {
+  const {name, value} = e.data;
+
+  const el = document.createElement("a-entity");
+  AFRAME.scenes[0].appendChild(el);
+  el.setAttribute("media-loader", { src: value, fitToBox: true, resolve: true });
+  el.setAttribute("networked", { template: "#interactable-media" } );
+  el.setAttribute("uploadedAssets");
+
+  // https://ipfs.exokit.org/ipfs/QmYe7eKMKTYWecarNHJxfTeChijucQTaPLxGtjH79s71A3.glb
+});
