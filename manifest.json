@@ -17,6 +17,11 @@
         "type": "string",
         "default": "hubs.mozilla.com"
       }
+    },
+    "events": {
+      "addModel": {
+        "type": "string"
+      }
     }
   }
 }
