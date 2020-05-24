@@ -159,6 +159,8 @@ import "./gltf-component-mappings";
 
 import { App } from "./App";
 
+import targetGlb from "./assets/models/target.glb";
+
 window.APP = new App();
 window.APP.RENDER_ORDER = {
   HUD_BACKGROUND: 1,
@@ -1598,6 +1600,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   linkChannel.setSocket(socket);
 });
 
+window.addEventListener('DOMContentLoaded', e => {
+  const aScene = document.body.querySelector('a-scene');
+  const aGltfModel1 = document.createElement('a-gltf-model');
+  aGltfModel1.setAttribute('src', targetGlb);
+  aGltfModel1.setAttribute('position', '-1 1 0');
+  aScene.appendChild(aGltfModel1);
+  const aGltfModel2 = document.createElement('a-gltf-model');
+  aGltfModel2.setAttribute('src', targetGlb);
+  aGltfModel2.setAttribute('position', '1 1 0');
+  aScene.appendChild(aGltfModel2);
+});
 navigator.xr.addEventListener('event', e => {
   const {name, value} = e.data;
 
