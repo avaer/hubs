@@ -159,6 +159,7 @@ import "./gltf-component-mappings";
 
 import { App } from "./App";
 
+import "./components/portal";
 import targetGlb from "./assets/models/target.glb";
 
 window.APP = new App();
@@ -1606,12 +1607,25 @@ window.addEventListener('DOMContentLoaded', e => {
   aGltfModel1.setAttribute('src', targetGlb);
   aGltfModel1.setAttribute('position', '-0.1 1 0');
   aGltfModel1.setAttribute('scale', '0.1 0.1 0.1');
+  aGltfModel1.setAttribute('portal', true);
+  aGltfModel1.setAttribute('side', 'left');
   aScene.appendChild(aGltfModel1);
+
   const aGltfModel2 = document.createElement('a-gltf-model');
   aGltfModel2.setAttribute('src', targetGlb);
   aGltfModel2.setAttribute('position', '0.1 1 0');
   aGltfModel2.setAttribute('scale', '0.1 0.1 0.1');
+  aGltfModel2.setAttribute('portal', true);
+  aGltfModel2.setAttribute('side', 'right');
   aScene.appendChild(aGltfModel2);
+
+  const portalButton = document.createElement('a-box');
+  portalButton.setAttribute('position', '0 0.8 0');
+  portalButton.setAttribute('scale', '0.2 0.1 0.1');
+  portalButton.setAttribute('color', '#808080');
+  portalButton.setAttribute('portal-button', true);
+  portalButton.setAttribute('visible', false);
+  aScene.appendChild(portalButton);
 });
 navigator.xr.addEventListener('event', e => {
   const {name, value} = e.data;
