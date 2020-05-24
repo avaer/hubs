@@ -1,0 +1,27 @@
+{
+  "name": "Mozilla Hubs",
+  "description": "Duck-themed multi-user virtual spaces in WebVR. Built with A-Frame.",
+  "xr_type": "webxr-site@0.0.1",
+  "start_url": "hub.html",
+  "xr_details": {
+    "schema": {
+      "hub_id": {
+        "type": "string",
+        "default": "cSNKEgE"
+      },
+      "vr_entry_type": {
+        "type": "string",
+        "default": "vr_now"
+      },
+      "RETICULUM_SERVER": {
+        "type": "string",
+        "default": "hubs.mozilla.com"
+      }
+    },
+    "events": {
+      "addModel": {
+        "type": "string"
+      }
+    }
+  }
+}

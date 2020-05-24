@@ -7,7 +7,9 @@ function registerRootSceneComponent(componentName) {
   AFRAME.GLTFModelPlus.registerComponent(componentName, componentName, (el, componentName, componentData) => {
     const sceneEl = AFRAME.scenes[0];
 
-    sceneEl.setAttribute(componentName, componentData);
+    if (componentName !== 'background') {
+      sceneEl.setAttribute(componentName, componentData);
+    }
 
     sceneEl.addEventListener(
       "reset_scene",

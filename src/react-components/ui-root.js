@@ -570,10 +570,15 @@ class UIRoot extends Component {
 
     if (hasGrantedMic) {
       await this.setMediaStreamToDefault();
+    }
+    this.beginOrSkipAudioSetup();
+
+    /* if (hasGrantedMic) {
+      await this.setMediaStreamToDefault();
       this.beginOrSkipAudioSetup();
     } else {
       this.pushHistoryState("entry_step", "mic_grant");
-    }
+    } */
 
     this.setState({ waitingOnAudio: false });
   };

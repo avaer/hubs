@@ -159,6 +159,8 @@ import "./gltf-component-mappings";
 
 import { App } from "./App";
 
+import targetGlb from "./assets/models/target.glb";
+
 window.APP = new App();
 window.APP.RENDER_ORDER = {
   HUD_BACKGROUND: 1,
@@ -173,7 +175,7 @@ const NOISY_OCCUPANT_COUNT = 12; // Above this # of occupants, we stop posting j
 const qs = new URLSearchParams(location.search);
 const isMobile = AFRAME.utils.device.isMobile();
 const isMobileVR = AFRAME.utils.device.isMobileVR();
-const isEmbed = window.self !== window.top;
+const isEmbed = false; // window.self !== window.top;
 if (isEmbed && !qs.get("embed_token")) {
   // Should be covered by X-Frame-Options, but just in case.
   throw new Error("no embed token");
@@ -273,7 +275,7 @@ if (document.location.pathname.includes("hub.html")) {
 const history = routerBaseName === "/" ? createMemoryHistory() : createBrowserHistory({ basename: routerBaseName });
 window.APP.history = history;
 
-const qsVREntryType = qs.get("vr_entry_type");
+const qsVREntryType = window.xrpackage.schema['vr_entry_type']; // qs.get("vr_entry_type");
 
 function mountUI(props = {}) {
   const scene = document.querySelector("a-scene");
@@ -726,7 +728,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const defaultRoomId = configs.feature("default_room_id");
 
   const hubId =
-    qs.get("hub_id") ||
+    // qs.get("hub_id") ||
+    window.xrpackage.schema['hub_id'] ||
     (document.location.pathname === "/" && defaultRoomId
       ? defaultRoomId
       : document.location.pathname.substring(1).split("/")[0]);
@@ -1595,4 +1598,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   authChannel.setSocket(socket);
   linkChannel.setSocket(socket);
+});
+
+window.addEventListener('DOMContentLoaded', e => {
+  const aScene = document.body.querySelector('a-scene');
+  const aGltfModel1 = document.createElement('a-gltf-model');
+  aGltfModel1.setAttribute('src', targetGlb);
+  aGltfModel1.setAttribute('position', '-0.1 1 0');
+  aGltfModel1.setAttribute('scale', '0.1 0.1 0.1');
+  aScene.appendChild(aGltfModel1);
+  const aGltfModel2 = document.createElement('a-gltf-model');
+  aGltfModel2.setAttribute('src', targetGlb);
+  aGltfModel2.setAttribute('position', '0.1 1 0');
+  aGltfModel2.setAttribute('scale', '0.1 0.1 0.1');
+  aScene.appendChild(aGltfModel2);
+});
+navigator.xr.addEventListener('event', e => {
+  const {name, value} = e.data;
+
+  const el = document.createElement("a-entity");
+  AFRAME.scenes[0].appendChild(el);
+  el.setAttribute("media-loader", { src: value, fitToBox: true, resolve: true });
+  el.setAttribute("networked", { template: "#interactable-media" } );
+  el.setAttribute("uploadedAssets");
+
+  // https://ipfs.exokit.org/ipfs/QmYe7eKMKTYWecarNHJxfTeChijucQTaPLxGtjH79s71A3.glb
 });

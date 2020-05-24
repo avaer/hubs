@@ -131,6 +131,7 @@ export async function getAvailableVREntryTypes() {
       daydream = VR_DEVICE_AVAILABILITY.no;
     }
   }
+  generic = VR_DEVICE_AVAILABILITY.yes;
 
   return { screen, generic, gearvr, daydream, cardboard, safari };
 }
