@@ -1604,12 +1604,12 @@ window.addEventListener('DOMContentLoaded', e => {
   const aScene = document.body.querySelector('a-scene');
   const aGltfModel1 = document.createElement('a-gltf-model');
   aGltfModel1.setAttribute('src', targetGlb);
-  aGltfModel1.setAttribute('position', '-1 1 0');
+  aGltfModel1.setAttribute('position', '-0.1 1 0');
   aGltfModel1.setAttribute('scale', '0.1 0.1 0.1');
   aScene.appendChild(aGltfModel1);
   const aGltfModel2 = document.createElement('a-gltf-model');
   aGltfModel2.setAttribute('src', targetGlb);
-  aGltfModel2.setAttribute('position', '1 1 0');
+  aGltfModel2.setAttribute('position', '0.1 1 0');
   aGltfModel2.setAttribute('scale', '0.1 0.1 0.1');
   aScene.appendChild(aGltfModel2);
 });
