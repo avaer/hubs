@@ -1,5 +1,6 @@
 import {upload} from '../utils/media-utils.js';
 import {proxiedUrlFor} from '../utils/media-url-utils.js';
+import {proxyHost} from '../utils/phoenix-utils';
 const { Vector3, Quaternion, Matrix4, Euler } = THREE;
 
 const localVector = new Vector3();
@@ -18,24 +19,8 @@ const portalSides = {
 window.portalSides = portalSides;
 
 AFRAME.registerComponent('portal', {
-  /* schema: {
-    camera: { type: "string", default: ".camera" },
-    leftController: { type: "string", default: ".left-controller" },
-    rightController: { type: "string", default: ".right-controller" }
-  }, */
   update(oldData) {
-    console.log('update', this, this.data, oldData);
-    /* if (this.data.camera !== oldData.camera) {
-      this.camera = this.el.querySelector(this.data.camera);
-    }
-
-    if (this.data.leftController !== oldData.leftController) {
-      this.leftController = this.el.querySelector(this.data.leftController);
-    }
-
-    if (this.data.rightController !== oldData.rightController) {
-      this.rightController = this.el.querySelector(this.data.rightController);
-    } */
+    // console.log('update', this, this.data, oldData);
   },
   tick(time, dt) {
     const side = this.el.getAttribute('side');
@@ -91,7 +76,7 @@ AFRAME.registerComponent('portal-button', {
     rightController: { type: "string", default: ".right-controller" }
   }, */
   update(oldData) {
-    console.log('update portal button', this, this.data, oldData);
+    // console.log('update portal button', this, this.data, oldData);
   },
   tick(time, dt) {
     // console.log('visible', this.el.getAttribute('visible'));
@@ -112,57 +97,65 @@ AFRAME.registerComponent('portal-button', {
               .premultiply(window.xrpackage.package.matrix)
               .decompose(localVector, localQuaternion, localVector2);
             if (portalSides.left) {
-              console.log('portal side left', portalSides.left);
-              // nothing
+              let src = portalSides.left.components['media-loader'].data.src;
+              src = `https://${proxyHost}/` + encodeURIComponent(src);
+              console.log('fetching', src);
+              fetch(src)
+                .then(res => res.arrayBuffer())
+                .then(ab => {
+                  const b = new Blob([ab], {
+                    type: 'model/gltf-binary',
+                  });
+                  b.name = 'model.glb';
+                  return b;
+                })
+                .then(b => XRPackage.compileFromFile(b))
+                .then(uint8Array => new XRPackage(uint8Array))
+                .then(p => {
+                  const portals = Array.from(document.querySelectorAll('[portal]'));
+                  const rightPortal = portals.filter(portal => portal.getAttribute('side') === 'right')[0];
+                  
+                  localMatrix
+                    .compose(rightPortal.getAttribute('position') || localVector.set(0, 0, 0), rightPortal.getAttribute('quaternion') || localQuaternion.set(0, 0, 0, 1), localVector2.set(1, 1, 1))
+                    .premultiply(localMatrix2.getInverse(viewingRig.object3D.matrix))
+                    .premultiply(window.xrpackage.package.matrix)
+                  p.setMatrix(localMatrix);
+
+                  return window.xrpackage.add(p);
+                });
+              portalSides.left.parentNode.removeChild(portalSides.left);
+              portalSides.left = null;
             } else if (portalSides.right) {
               console.log('portal side right', portalSides.right);
-              /* portalSides.right.upload()
-                .then(hash => {
-                  console.log('got hash', hash, `https://ipfs.exokit.org/ipfs/${hash}.wbn`);
-                }); */
               const d = portalSides.right.getMainData();
               const type = 'model/gltf-binary';
               const b = new Blob([d], {type});
               upload(b, type)
                 .then(response => {
-                  // console.log('upload done', j);
-
                   const srcUrl = new URL(proxiedUrlFor(response.origin));
                   srcUrl.searchParams.set("token", response.meta.access_token);
-                  
+
                   const portals = Array.from(document.querySelectorAll('[portal]'));
                   const leftPortal = portals.filter(portal => portal.getAttribute('side') === 'left')[0];
-                  
+
                   console.log('got portals', portals, leftPortal);
-                  
+
                   const entity = document.createElement('a-entity');
                   entity.setAttribute("media-loader", { resolve: false, src: srcUrl.href, fileId: response.file_id });
                   entity.setAttribute("networked", { template: "#interactable-media" } );
                   entity.setAttribute('position', leftPortal.getAttribute('position') || localVector.set(0, 0, 0));
                   entity.setAttribute('quaternion', leftPortal.getAttribute('quaternion') || localQuaternion.set(0, 0, 0, 1));
                   AFRAME.scenes[0].appendChild(entity);
-                  
+
                   console.log('add entity', entity);
                 });
               window.xrpackage.remove(portalSides.right);
               portalSides.right = null;
-              // this.el.setAttribute('visible', false);
             }
             break;
           }
         }
       }
-      // console.log('got tick', time, dt);
-      /* const position = this.el.getAttribute('position');
-      const side = this.el.getAttribute('side');
-      const models = Array.from(document.querySelectorAll('[medialoader][networked]'));
-      const _getDistance = m => m.el.object3D.position.distanceTo(position);
-      const closestModels = models.sort((a, b) => _getDistance(a) - _getDistance(b));
-      console.log('tick', this, closestModels, portalSides);
-      if (closestModels.length > 0) {
-        const closestModel = closestModels[0];
-        portalSides[side] = closestModel;
-      } */
     }
   },
 });
