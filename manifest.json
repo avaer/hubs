@@ -7,7 +7,7 @@
     "schema": {
       "hub_id": {
         "type": "string",
-        "default": "YQN8mHc"
+        "default": "agyQ5X7"
       },
       "vr_entry_type": {
         "type": "string",
