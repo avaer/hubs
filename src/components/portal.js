@@ -1,3 +1,5 @@
+import {upload} from '../utils/media-utils.js';
+import {proxiedUrlFor} from '../utils/media-url-utils.js';
 const { Vector3, Quaternion, Matrix4, Euler } = THREE;
 
 const localVector = new Vector3();
@@ -39,26 +41,27 @@ AFRAME.registerComponent('portal', {
     const side = this.el.getAttribute('side');
     const viewingRig = document.getElementById('viewing-rig');
     if (side && !portalSides[side] && viewingRig) {
-      localMatrix
-        .compose(this.el.getAttribute('position') || localVector.set(0, 0, 0), this.el.getAttribute('quaternion') || localQuaternion.set(0, 0, 0, 1), localVector2.set(1, 1, 1))
-        .premultiply(localMatrix2.getInverse(viewingRig.object3D.matrix))
-        .premultiply(window.xrpackage.package.matrix)
-        .decompose(localVector, localQuaternion, localVector2);
-      
       if (side === 'left') {
-        const medias = Array.from(document.querySelectorAll('[medialoader][networked]'));
-        const _getDistance = m => m.el.object3D.position.distanceTo(position);
+        const position = this.el.getAttribute('position') || localVector.set(0, 0, 0);
+        const medias = Array.from(document.querySelectorAll('[media-loader][networked]'));
+        const _getDistance = m => m.object3D.position.distanceTo(position);
         const closestModels = medias.sort((a, b) => _getDistance(a) - _getDistance(b));
         if (closestModels.length > 0) {
           const closestModel = closestModels[0];
-          if (_getDistance(closestPackage) < 0.3) {
-            closestModel.setAttribute('position', this.getAttribute('position'));
-            closestModel.setAttribute('quaternion', this.getAttribute('quaternion'));
-            closestModel.setAttribute('scale', this.getAttribute('scale'));
+          if (_getDistance(closestModel) < 1) {
+            closestModel.setAttribute('position', this.el.getAttribute('position'));
+            closestModel.setAttribute('quaternion', this.el.getAttribute('quaternion'));
+            // closestModel.setAttribute('scale', this.el.getAttribute('scale'));
             portalSides[side] = closestModel;
           }
         }
       } else if (side === 'right') {
+        localMatrix
+          .compose(this.el.getAttribute('position') || localVector.set(0, 0, 0), this.el.getAttribute('quaternion') || localQuaternion.set(0, 0, 0, 1), localVector2.set(1, 1, 1))
+          .premultiply(localMatrix2.getInverse(viewingRig.object3D.matrix))
+          .premultiply(window.xrpackage.package.matrix)
+          .decompose(localVector, localQuaternion, localVector2);
+        
         const packages = window.xrpackage.packages.filter(p => p !== window.xrpackage.package);
         const _getDistance = p => {
           p.matrix.decompose(localVector3, localQuaternion2, localVector4);
@@ -91,16 +94,75 @@ AFRAME.registerComponent('portal-button', {
     console.log('update portal button', this, this.data, oldData);
   },
   tick(time, dt) {
-    // console.log('got tick', time, dt);
-    /* const position = this.el.getAttribute('position');
-    const side = this.el.getAttribute('side');
-    const models = Array.from(document.querySelectorAll('[medialoader][networked]'));
-    const _getDistance = m => m.el.object3D.position.distanceTo(position);
-    const closestModels = models.sort((a, b) => _getDistance(a) - _getDistance(b));
-    console.log('tick', this, closestModels, portalSides);
-    if (closestModels.length > 0) {
-      const closestModel = closestModels[0];
-      portalSides[side] = closestModel;
-    } */
+    // console.log('visible', this.el.getAttribute('visible'));
+    const viewingRig = document.getElementById('viewing-rig');
+    if (this.el.getAttribute('visible') && viewingRig) {
+      const {xrSession} = this.el.sceneEl;
+      // console.log('got xr session', xrSession);
+      if (xrSession) {
+        const {inputSources} = xrSession;
+        // console.log('got input sources', inputSources);
+        for (let i = 0; i < inputSources.length; i++) {
+          const inputSource = inputSources[i];
+          const {gamepad} = inputSource;
+          if (gamepad && gamepad.buttons[0].pressed) {
+            localMatrix
+              .compose(this.el.getAttribute('position') || localVector.set(0, 0, 0), this.el.getAttribute('quaternion') || localQuaternion.set(0, 0, 0, 1), localVector2.set(1, 1, 1))
+              .premultiply(localMatrix2.getInverse(viewingRig.object3D.matrix))
+              .premultiply(window.xrpackage.package.matrix)
+              .decompose(localVector, localQuaternion, localVector2);
+            if (portalSides.left) {
+              console.log('portal side left', portalSides.left);
+              // nothing
+            } else if (portalSides.right) {
+              console.log('portal side right', portalSides.right);
+              /* portalSides.right.upload()
+                .then(hash => {
+                  console.log('got hash', hash, `https://ipfs.exokit.org/ipfs/${hash}.wbn`);
+                }); */
+              const d = portalSides.right.getMainData();
+              const type = 'model/gltf-binary';
+              const b = new Blob([d], {type});
+              upload(b, type)
+                .then(response => {
+                  // console.log('upload done', j);
+
+                  const srcUrl = new URL(proxiedUrlFor(response.origin));
+                  srcUrl.searchParams.set("token", response.meta.access_token);
+                  
+                  const portals = Array.from(document.querySelectorAll('[portal]'));
+                  const leftPortal = portals.filter(portal => portal.getAttribute('side') === 'left')[0];
+                  
+                  console.log('got portals', portals, leftPortal);
+                  
+                  const entity = document.createElement('a-entity');
+                  entity.setAttribute("media-loader", { resolve: false, src: srcUrl.href, fileId: response.file_id });
+                  entity.setAttribute("networked", { template: "#interactable-media" } );
+                  entity.setAttribute('position', leftPortal.getAttribute('position') || localVector.set(0, 0, 0));
+                  entity.setAttribute('quaternion', leftPortal.getAttribute('quaternion') || localQuaternion.set(0, 0, 0, 1));
+                  AFRAME.scenes[0].appendChild(entity);
+                  
+                  console.log('add entity', entity);
+                });
+              window.xrpackage.remove(portalSides.right);
+              portalSides.right = null;
+              // this.el.setAttribute('visible', false);
+            }
+            break;
+          }
+        }
+      }
+      // console.log('got tick', time, dt);
+      /* const position = this.el.getAttribute('position');
+      const side = this.el.getAttribute('side');
+      const models = Array.from(document.querySelectorAll('[medialoader][networked]'));
+      const _getDistance = m => m.el.object3D.position.distanceTo(position);
+      const closestModels = models.sort((a, b) => _getDistance(a) - _getDistance(b));
+      console.log('tick', this, closestModels, portalSides);
+      if (closestModels.length > 0) {
+        const closestModel = closestModels[0];
+        portalSides[side] = closestModel;
+      } */
+    }
   },
 });
