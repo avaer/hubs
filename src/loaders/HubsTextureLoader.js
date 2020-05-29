@@ -1,3 +1,5 @@
+import {proxyHost} from "../utils/phoenix-utils";
+
 function loadAsync(loader, url, onProgress) {
   return new Promise((resolve, reject) => loader.load(url, resolve, onProgress, reject));
 }
@@ -21,6 +23,12 @@ export default class HubsTextureLoader {
 
   async loadTextureAsync(texture, src, onProgress) {
     let imageLoader;
+
+    const proxyHeader = `https://${proxyHost}/`;
+    const localHeader = `${location.protocol}//${location.host}/`;
+    if (/^(https?:)?\/\//i.test(src) && !src.startsWith(localHeader) && !src.startsWith(proxyHeader)) {
+      src = `https://${proxyHost}/` + encodeURIComponent(src);
+    }
 
     if (window.createImageBitmap !== undefined) {
       imageLoader = new THREE.ImageBitmapLoader(this.manager);
