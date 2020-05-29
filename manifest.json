@@ -7,7 +7,7 @@
     "schema": {
       "hub_id": {
         "type": "string",
-        "default": "agyQ5X7"
+        "default": "gvGy8vr"
       },
       "vr_entry_type": {
         "type": "string",
@@ -15,7 +15,7 @@
       },
       "RETICULUM_SERVER": {
         "type": "string",
-        "default": "pluto-hub.com"
+        "default": "hubs.mozilla.com"
       }
     },
     "events": {
